@@ -2,7 +2,7 @@
 
 # Spruce
 
-Spruce adapts Go [structured logging] to pretty test output.
+Spruce pretty-prints Go structured logs as test output.
 
 [![Documentation](https://img.shields.io/badge/go.dev-documentation-007d9c?&style=for-the-badge)](https://pkg.go.dev/github.com/dogmatiq/spruce)
 [![Latest Version](https://img.shields.io/github/tag/dogmatiq/spruce.svg?&style=for-the-badge&label=semver)](https://github.com/dogmatiq/spruce/releases)
@@ -11,7 +11,16 @@ Spruce adapts Go [structured logging] to pretty test output.
 
 </div>
 
-## Example
+Spruce provides an [`slog.Handler`] implementation that acts as an adaptor
+between an [`slog.Logger`] and the [`testing.TB`] interface.
+
+<!-- references -->
+
+[`slog.Handler`]: https://pkg.go.dev/log/slog#Handler
+[`slog.Logger`]: https://pkg.go.dev/log/slog#Logger
+[`testing.TB`]: https://pkg.go.dev/testing#TB
+
+## Example Usage
 
 ```go
 package pkg_test
@@ -60,5 +69,3 @@ spruce.go:76: [INFO] hello, world!
     ╰─┬ <group a>
       ╰── <key-1> ┈ <value-1>
 ```
-
-[structured logging]: https://pkg.go.dev/slog
