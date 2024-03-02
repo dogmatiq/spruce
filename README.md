@@ -58,7 +58,7 @@ spruce.go:76: [INFO] hello, world!
     │ ├── <key-1> ┈ <value-1>
     │ ╰── <key-2> ┈ <value-2>
     ╰─┬ <group a>
-        ╰── <key-1> ┈ <value-1>
+      ╰── <key-1> ┈ <value-1>
 ```
 
 [structured logging]: https://pkg.go.dev/slog
