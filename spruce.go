@@ -7,6 +7,7 @@ import (
 	"slices"
 	"strings"
 	"testing"
+	"time"
 )
 
 // TestingT is the subset of the [testing.TB] interface that is used to write
@@ -24,13 +25,17 @@ func NewLogger(t TestingT) *slog.Logger {
 
 // NewHandler returns a new [slog.Handler] that writes to t.
 func NewHandler(t TestingT) slog.Handler {
-	return &handler{T: t}
+	return &handler{
+		T:     t,
+		epoch: time.Now(),
+	}
 }
 
 type handler struct {
 	T      TestingT
 	attrs  []slog.Attr
 	groups []string
+	epoch  time.Time
 }
 
 func (h *handler) Enabled(context.Context, slog.Level) bool {
@@ -63,9 +68,18 @@ func (h *handler) Handle(_ context.Context, rec slog.Record) error {
 	}
 
 	level := rec.Level.String()
+
+	elapsed := rec.Time.Sub(h.epoch)
+
 	buf.WriteByte('[')
 	buf.WriteString(level)
+	buf.WriteByte(' ')
+	if elapsed > 0 {
+		buf.WriteByte('+')
+	}
+	buf.WriteString(elapsed.String())
 	buf.WriteString("] ")
+
 	buf.WriteString(rec.Message)
 
 	writeAttrs(buf, 0, attrs, true)
@@ -139,6 +153,7 @@ func (h *handler) WithAttrs(attrs []slog.Attr) slog.Handler {
 		T:      h.T,
 		attrs:  append(slices.Clone(h.attrs), attrs...),
 		groups: h.groups,
+		epoch:  h.epoch,
 	}
 }
 
@@ -147,5 +162,6 @@ func (h *handler) WithGroup(name string) slog.Handler {
 		T:      h.T,
 		attrs:  h.attrs,
 		groups: append(slices.Clone(h.groups), name),
+		epoch:  h.epoch,
 	}
 }

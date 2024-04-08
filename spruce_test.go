@@ -3,6 +3,7 @@ package spruce_test
 import (
 	"fmt"
 	"log/slog"
+	"regexp"
 	"strings"
 	"testing"
 	"time"
@@ -17,7 +18,7 @@ func TestHandler_noAttributes(t *testing.T) {
 
 	l.Info("<message>")
 	s.Expect(
-		`[INFO] <message>`,
+		`[INFO <timestamp>] <message>`,
 	)
 }
 
@@ -27,7 +28,7 @@ func TestHandler_stringAttribute(t *testing.T) {
 
 	l.Info("<message>", "<key>", "<value>")
 	s.Expect(
-		`[INFO] <message>`,
+		`[INFO <timestamp>] <message>`,
 		`╰── <key> ┈ <value>`,
 	)
 }
@@ -42,7 +43,7 @@ func TestHandler_stringerAttribute(t *testing.T) {
 		1*time.Second,
 	)
 	s.Expect(
-		`[INFO] <message>`,
+		`[INFO <timestamp>] <message>`,
 		`╰── duration ┈ 1s`,
 	)
 }
@@ -57,7 +58,7 @@ func TestHandler_attributeAlignment(t *testing.T) {
 		"<much longer>", "<value-2>",
 	)
 	s.Expect(
-		`[INFO] <message>`,
+		`[INFO <timestamp>] <message>`,
 		`├── <short> ┈┈┈┈┈┈┈ <value-1>`,
 		`╰── <much longer> ┈ <value-2>`,
 	)
@@ -80,7 +81,7 @@ func TestHandler_nestedAttributes(t *testing.T) {
 		),
 	)
 	s.Expect(
-		`[INFO] <message>`,
+		`[INFO <timestamp>] <message>`,
 		`├─┬ <group b>`,
 		`│ ├── <key-1> ┈ <value-1>`,
 		`│ ╰── <key-2> ┈ <value-2>`,
@@ -98,7 +99,7 @@ func TestHandler_whitespaceEscaping(t *testing.T) {
 		"<key>", "value\nwith\nnewlines",
 	)
 	s.Expect(
-		`[INFO] <message>`,
+		`[INFO <timestamp>] <message>`,
 		`╰── <key> ┈ "value\nwith\nnewlines"`,
 	)
 }
@@ -111,7 +112,7 @@ func TestHandler_WithAttrs(t *testing.T) {
 
 	l.Info("<message>")
 	s.Expect(
-		`[INFO] <message>`,
+		`[INFO <timestamp>] <message>`,
 		`╰── <key> ┈ <value>`,
 	)
 }
@@ -124,7 +125,7 @@ func TestHandler_WithAttrs_sameKey(t *testing.T) {
 
 	l.Info("<message>", "<key>", "<value-2>")
 	s.Expect(
-		`[INFO] <message>`,
+		`[INFO <timestamp>] <message>`,
 		`├── <key> ┈ <value-1>`,
 		`╰── <key> ┈ <value-2>`,
 	)
@@ -138,7 +139,7 @@ func TestHandler_WithGroup(t *testing.T) {
 
 	l.Info("<message>", "<key>", "<value>")
 	s.Expect(
-		`[INFO] <message>`,
+		`[INFO <timestamp>] <message>`,
 		`╰─┬ <group>`,
 		`  ╰── <key> ┈ <value>`,
 	)
@@ -155,8 +156,11 @@ func (s *testingTStub) Log(args ...any) {
 }
 
 func (s *testingTStub) Expect(lines ...string) {
+	timestamp := regexp.MustCompile(`\[([A-Z]+) .+?\]`)
+
 	expect := strings.Join(lines, "\n")
 	for _, line := range s.actual {
+		line = timestamp.ReplaceAllString(line, "[$1 <timestamp>]")
 		if line == expect {
 			return
 		}
