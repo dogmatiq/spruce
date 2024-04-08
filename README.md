@@ -49,7 +49,7 @@ func systemUnderTest(logger *slog.Logger) {
 		slog.Group(
 			"<group b>",
 			"<key-1>", "<value-1>",
-            "<key-2>", "<value-2>",
+			"<key-2>", "<value-2>",
 		),
 		slog.Group(
 			"<group a>",
