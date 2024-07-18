@@ -9,10 +9,11 @@ import (
 )
 
 type handler struct {
-	log       func(string) error
-	attrs     []slog.Attr
-	groups    []string
-	writeTime func(*strings.Builder, slog.Record)
+	log          func(string) error
+	attrs        []slog.Attr
+	groups       []string
+	initialDepth int
+	writeTime    func(*strings.Builder, slog.Record)
 }
 
 func (h *handler) Enabled(context.Context, slog.Level) bool {
@@ -70,7 +71,7 @@ func (h *handler) Handle(_ context.Context, rec slog.Record) error {
 
 	buf.WriteString(rec.Message)
 
-	writeAttrs(buf, 0, attrs, true)
+	writeAttrs(buf, h.initialDepth, attrs, true)
 
 	return h.log(buf.String())
 }

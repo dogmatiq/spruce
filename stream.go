@@ -3,20 +3,18 @@ package spruce
 import (
 	"io"
 	"log/slog"
-	"strings"
-	"time"
 )
 
 var newLine = []byte{'\n'}
 
 // NewStreamLogger returns a [slog.Logger] that writes to w.
-func NewStreamLogger(w io.Writer) *slog.Logger {
-	return slog.New(NewStreamHandler(w))
+func NewStreamLogger(w io.Writer, options ...Option) *slog.Logger {
+	return slog.New(NewStreamHandler(w, options...))
 }
 
 // NewStreamHandler returns a new [slog.Handler] that writes to w.
-func NewStreamHandler(w io.Writer) slog.Handler {
-	return &handler{
+func NewStreamHandler(w io.Writer, options ...Option) slog.Handler {
+	h := &handler{
 		log: func(s string) error {
 			if _, err := w.Write([]byte(s)); err != nil {
 				return err
@@ -26,10 +24,11 @@ func NewStreamHandler(w io.Writer) slog.Handler {
 			}
 			return nil
 		},
-		writeTime: func(w *strings.Builder, rec slog.Record) {
-			w.WriteString(
-				rec.Time.Format(time.RFC3339),
-			)
-		},
+		initialDepth: 1,
 	}
+
+	WithRelativeTimestamps()(h)
+	applyOptions(h, options)
+
+	return h
 }
