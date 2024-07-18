@@ -132,6 +132,21 @@ func TestHandler_WithAttrs_sameKey(t *testing.T) {
 	)
 }
 
+func TestHandler_WithAttrs_inGroupKey(t *testing.T) {
+	s := &testingTStub{T: t}
+	l := spruce.
+		NewTestLogger(s).
+		WithGroup("<group>").
+		With("<key>", "<value>")
+
+	l.Info("<message>")
+	s.Expect(
+		`[INFO <timestamp>] <message>`,
+		`╰─┬ <group>`,
+		`  ╰── <key> ┈ <value>`,
+	)
+}
+
 func TestHandler_WithGroup(t *testing.T) {
 	s := &testingTStub{T: t}
 	l := spruce.

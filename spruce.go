@@ -22,15 +22,21 @@ func (h *handler) Enabled(context.Context, slog.Level) bool {
 
 func (h *handler) Handle(_ context.Context, rec slog.Record) error {
 	buf := &strings.Builder{}
-	attrs := slices.Clone(h.attrs)
+	var attrs []slog.Attr
 
 	if len(h.groups) == 0 {
+		attrs = slices.Clone(h.attrs)
 		rec.Attrs(func(attr slog.Attr) bool {
 			attrs = append(attrs, attr)
 			return true
 		})
 	} else {
 		var grouped []any
+
+		for _, attr := range h.attrs {
+			grouped = append(grouped, attr)
+		}
+
 		rec.Attrs(func(attr slog.Attr) bool {
 			grouped = append(grouped, attr)
 			return true
