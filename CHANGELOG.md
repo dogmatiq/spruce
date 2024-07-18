@@ -10,6 +10,13 @@ The format is based on [Keep a Changelog], and this project adheres to
 [Keep a Changelog]: https://keepachangelog.com/en/1.0.0/
 [Semantic Versioning]: https://semver.org/spec/v2.0.0.html
 
+## [0.2.2] - 2024-07-19
+
+### Changed
+
+- Display a wall-clock time (instead of the duration since the logger was
+  created) when logging to an `io.Writer`.'
+
 ## [0.2.1] - 2024-07-19
 
 ### Changed

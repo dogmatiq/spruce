@@ -3,6 +3,7 @@ package spruce
 import (
 	"io"
 	"log/slog"
+	"strings"
 	"time"
 )
 
@@ -25,6 +26,10 @@ func NewStreamHandler(w io.Writer) slog.Handler {
 			}
 			return nil
 		},
-		epoch: time.Now(),
+		writeTime: func(w *strings.Builder, rec slog.Record) {
+			w.WriteString(
+				rec.Time.Format(time.RFC3339),
+			)
+		},
 	}
 }

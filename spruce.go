@@ -6,14 +6,13 @@ import (
 	"log/slog"
 	"slices"
 	"strings"
-	"time"
 )
 
 type handler struct {
-	log    func(string) error
-	attrs  []slog.Attr
-	groups []string
-	epoch  time.Time
+	log       func(string) error
+	attrs     []slog.Attr
+	groups    []string
+	writeTime func(*strings.Builder, slog.Record)
 }
 
 func (h *handler) Enabled(context.Context, slog.Level) bool {
@@ -53,15 +52,10 @@ func (h *handler) Handle(_ context.Context, rec slog.Record) error {
 
 	level := rec.Level.String()
 
-	elapsed := rec.Time.Sub(h.epoch)
-
 	buf.WriteByte('[')
 	buf.WriteString(level)
 	buf.WriteByte(' ')
-	if elapsed > 0 {
-		buf.WriteByte('+')
-	}
-	buf.WriteString(elapsed.String())
+	h.writeTime(buf, rec)
 
 	for i, g := range h.groups {
 		if i == 0 {
@@ -142,18 +136,18 @@ func writeAttrs(
 
 func (h *handler) WithAttrs(attrs []slog.Attr) slog.Handler {
 	return &handler{
-		log:    h.log,
-		attrs:  append(slices.Clone(h.attrs), attrs...),
-		groups: h.groups,
-		epoch:  h.epoch,
+		log:       h.log,
+		attrs:     append(slices.Clone(h.attrs), attrs...),
+		groups:    h.groups,
+		writeTime: h.writeTime,
 	}
 }
 
 func (h *handler) WithGroup(name string) slog.Handler {
 	return &handler{
-		log:    h.log,
-		attrs:  h.attrs,
-		groups: append(slices.Clone(h.groups), name),
-		epoch:  h.epoch,
+		log:       h.log,
+		attrs:     h.attrs,
+		groups:    append(slices.Clone(h.groups), name),
+		writeTime: h.writeTime,
 	}
 }
