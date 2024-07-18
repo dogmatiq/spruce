@@ -37,12 +37,25 @@ func WithAbsoluteTimestamps() Option {
 	}
 }
 
+// WithThreshold configures a handler to only log messages at or above the
+// specified level.
+func WithThreshold(level slog.Level) Option {
+	return func(h *handler) {
+		h.threshold = level
+	}
+}
+
 func applyOptions(h *handler, options []Option) {
+	options = append(
+		[]Option{
+			WithRelativeTimestamps(),
+			WithThreshold(slog.LevelDebug),
+		},
+
+		options...,
+	)
+
 	for _, opt := range options {
 		opt(h)
-	}
-
-	if h.writeTime == nil {
-		WithRelativeTimestamps()(h)
 	}
 }

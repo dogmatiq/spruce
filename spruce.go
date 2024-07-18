@@ -13,6 +13,7 @@ type handler struct {
 	attrs        []slog.Attr
 	groups       []string
 	initialDepth int
+	threshold    slog.Level
 	writeTime    func(*strings.Builder, slog.Record)
 }
 
@@ -21,6 +22,10 @@ func (h *handler) Enabled(context.Context, slog.Level) bool {
 }
 
 func (h *handler) Handle(_ context.Context, rec slog.Record) error {
+	if rec.Level < h.threshold {
+		return nil
+	}
+
 	buf := &strings.Builder{}
 	var attrs []slog.Attr
 

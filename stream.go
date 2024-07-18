@@ -27,7 +27,7 @@ func NewStreamHandler(w io.Writer, options ...Option) slog.Handler {
 		initialDepth: 1,
 	}
 
-	WithRelativeTimestamps()(h)
+	WithAbsoluteTimestamps()(h)
 	applyOptions(h, options)
 
 	return h
