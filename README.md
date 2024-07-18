@@ -2,7 +2,7 @@
 
 # Spruce
 
-Spruce pretty-prints Go structured logs as test output.
+Spruce pretty-prints Go structured logs for humans.
 
 [![Documentation](https://img.shields.io/badge/go.dev-documentation-007d9c?&style=for-the-badge)](https://pkg.go.dev/github.com/dogmatiq/spruce)
 [![Latest Version](https://img.shields.io/github/tag/dogmatiq/spruce.svg?&style=for-the-badge&label=semver)](https://github.com/dogmatiq/spruce/releases)
@@ -12,10 +12,16 @@ Spruce pretty-prints Go structured logs as test output.
 </div>
 
 Spruce provides an [`slog.Handler`] implementation that acts as an adaptor
-between an [`slog.Logger`] and the [`testing.TB`] interface.
+between an [`slog.Logger`] and the [`io.Writer`] and [`testing.TB`] interfaces.
+
+It is intended for use in places where structured log messages will be read by
+**humans**, such as within tests or during development. The output format is not
+particular suitable for machine parsing; use the built-in JSON or text
+formatters for that.
 
 <!-- references -->
 
+[`io.Writer`]: https://pkg.go.dev/io#Writer
 [`slog.Handler`]: https://pkg.go.dev/log/slog#Handler
 [`slog.Logger`]: https://pkg.go.dev/log/slog#Logger
 [`testing.TB`]: https://pkg.go.dev/testing#TB
@@ -34,7 +40,7 @@ import (
 
 func TestSomething(t *testing.T) {
     // Create a new spruce logger that directs logs to t.
-    logger := spruce.NewLogger(t)
+    logger := spruce.NewTestLogger(t)
 
     // Run the application code that is being tested, and direct its log output
     // to the test log.
