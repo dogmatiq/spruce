@@ -141,7 +141,7 @@ func TestHandler_WithAttrs_inGroupKey(t *testing.T) {
 
 	l.Info("<message>")
 	s.Expect(
-		`[INFO <timestamp>] <message>`,
+		`[INFO <timestamp> <group>] <message>`,
 		`╰─┬ <group>`,
 		`  ╰── <key> ┈ <value>`,
 	)
@@ -155,9 +155,25 @@ func TestHandler_WithGroup(t *testing.T) {
 
 	l.Info("<message>", "<key>", "<value>")
 	s.Expect(
-		`[INFO <timestamp>] <message>`,
+		`[INFO <timestamp> <group>] <message>`,
 		`╰─┬ <group>`,
 		`  ╰── <key> ┈ <value>`,
+	)
+}
+
+func TestHandler_WithGroup_nested(t *testing.T) {
+	s := &testingTStub{T: t}
+	l := spruce.
+		NewTestLogger(s).
+		WithGroup("<parent>").
+		WithGroup("<child>")
+
+	l.Info("<message>", "<key>", "<value>")
+	s.Expect(
+		`[INFO <timestamp> <parent>.<child>] <message>`,
+		`╰─┬ <parent>`,
+		`  ╰─┬ <child>`,
+		`    ╰── <key> ┈ <value>`,
 	)
 }
 
@@ -172,11 +188,11 @@ func (s *testingTStub) Log(args ...any) {
 }
 
 func (s *testingTStub) Expect(lines ...string) {
-	timestamp := regexp.MustCompile(`\[([A-Z]+) .+?\]`)
+	timestamp := regexp.MustCompile(`\[([A-Z]+) [^\]\s]+`)
 
 	expect := strings.Join(lines, "\n")
 	for _, line := range s.actual {
-		line = timestamp.ReplaceAllString(line, "[$1 <timestamp>]")
+		line = timestamp.ReplaceAllString(line, "[$1 <timestamp>")
 		if line == expect {
 			return
 		}

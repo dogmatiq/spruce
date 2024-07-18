@@ -12,6 +12,11 @@ The format is based on [Keep a Changelog], and this project adheres to
 
 ## [Unreleased]
 
+### Changed
+
+- The group name is now displayed in the "meta-data" section at the beginning of
+  the log line.
+
 ### Fixed
 
 - `With()` now places attributes in the current group instead of at the root.

@@ -62,6 +62,16 @@ func (h *handler) Handle(_ context.Context, rec slog.Record) error {
 		buf.WriteByte('+')
 	}
 	buf.WriteString(elapsed.String())
+
+	for i, g := range h.groups {
+		if i == 0 {
+			buf.WriteByte(' ')
+		} else {
+			buf.WriteByte('.')
+		}
+		buf.WriteString(g)
+	}
+
 	buf.WriteString("] ")
 
 	buf.WriteString(rec.Message)
