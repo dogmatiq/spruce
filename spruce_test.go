@@ -9,12 +9,13 @@ import (
 	"time"
 
 	"github.com/dogmatiq/spruce"
+	. "github.com/dogmatiq/spruce"
 	"github.com/google/go-cmp/cmp"
 )
 
 func TestHandler_noAttributes(t *testing.T) {
 	s := &testingTStub{T: t}
-	l := spruce.NewLogger(s)
+	l := NewTestLogger(s)
 
 	l.Info("<message>")
 	s.Expect(
@@ -24,7 +25,7 @@ func TestHandler_noAttributes(t *testing.T) {
 
 func TestHandler_stringAttribute(t *testing.T) {
 	s := &testingTStub{T: t}
-	l := spruce.NewLogger(s)
+	l := NewTestLogger(s)
 
 	l.Info("<message>", "<key>", "<value>")
 	s.Expect(
@@ -35,7 +36,7 @@ func TestHandler_stringAttribute(t *testing.T) {
 
 func TestHandler_stringerAttribute(t *testing.T) {
 	s := &testingTStub{T: t}
-	l := spruce.NewLogger(s)
+	l := NewTestLogger(s)
 
 	l.Info(
 		"<message>",
@@ -50,7 +51,7 @@ func TestHandler_stringerAttribute(t *testing.T) {
 
 func TestHandler_attributeAlignment(t *testing.T) {
 	s := &testingTStub{T: t}
-	l := spruce.NewLogger(s)
+	l := NewTestLogger(s)
 
 	l.Info(
 		"<message>",
@@ -66,7 +67,7 @@ func TestHandler_attributeAlignment(t *testing.T) {
 
 func TestHandler_nestedAttributes(t *testing.T) {
 	s := &testingTStub{T: t}
-	l := spruce.NewLogger(s)
+	l := NewTestLogger(s)
 
 	l.Info(
 		"<message>",
@@ -92,7 +93,7 @@ func TestHandler_nestedAttributes(t *testing.T) {
 
 func TestHandler_whitespaceEscaping(t *testing.T) {
 	s := &testingTStub{T: t}
-	l := spruce.NewLogger(s)
+	l := NewTestLogger(s)
 
 	l.Info(
 		"<message>",
@@ -107,7 +108,7 @@ func TestHandler_whitespaceEscaping(t *testing.T) {
 func TestHandler_WithAttrs(t *testing.T) {
 	s := &testingTStub{T: t}
 	l := spruce.
-		NewLogger(s).
+		NewTestLogger(s).
 		With("<key>", "<value>")
 
 	l.Info("<message>")
@@ -120,7 +121,7 @@ func TestHandler_WithAttrs(t *testing.T) {
 func TestHandler_WithAttrs_sameKey(t *testing.T) {
 	s := &testingTStub{T: t}
 	l := spruce.
-		NewLogger(s).
+		NewTestLogger(s).
 		With("<key>", "<value-1>")
 
 	l.Info("<message>", "<key>", "<value-2>")
@@ -134,7 +135,7 @@ func TestHandler_WithAttrs_sameKey(t *testing.T) {
 func TestHandler_WithGroup(t *testing.T) {
 	s := &testingTStub{T: t}
 	l := spruce.
-		NewLogger(s).
+		NewTestLogger(s).
 		WithGroup("<group>")
 
 	l.Info("<message>", "<key>", "<value>")

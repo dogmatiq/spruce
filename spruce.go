@@ -6,33 +6,11 @@ import (
 	"log/slog"
 	"slices"
 	"strings"
-	"testing"
 	"time"
 )
 
-// TestingT is the subset of the [testing.TB] interface that is used to write
-// logs.
-type TestingT interface {
-	Log(...any)
-}
-
-var _ TestingT = (testing.TB)(nil)
-
-// NewLogger returns a [slog.Logger] that writes to t.
-func NewLogger(t TestingT) *slog.Logger {
-	return slog.New(NewHandler(t))
-}
-
-// NewHandler returns a new [slog.Handler] that writes to t.
-func NewHandler(t TestingT) slog.Handler {
-	return &handler{
-		T:     t,
-		epoch: time.Now(),
-	}
-}
-
 type handler struct {
-	T      TestingT
+	log    func(string) error
 	attrs  []slog.Attr
 	groups []string
 	epoch  time.Time
@@ -84,9 +62,7 @@ func (h *handler) Handle(_ context.Context, rec slog.Record) error {
 
 	writeAttrs(buf, 0, attrs, true)
 
-	h.T.Log(buf.String())
-
-	return nil
+	return h.log(buf.String())
 }
 
 func writeAttrs(
@@ -150,7 +126,7 @@ func writeAttrs(
 
 func (h *handler) WithAttrs(attrs []slog.Attr) slog.Handler {
 	return &handler{
-		T:      h.T,
+		log:    h.log,
 		attrs:  append(slices.Clone(h.attrs), attrs...),
 		groups: h.groups,
 		epoch:  h.epoch,
@@ -159,7 +135,7 @@ func (h *handler) WithAttrs(attrs []slog.Attr) slog.Handler {
 
 func (h *handler) WithGroup(name string) slog.Handler {
 	return &handler{
-		T:      h.T,
+		log:    h.log,
 		attrs:  h.attrs,
 		groups: append(slices.Clone(h.groups), name),
 		epoch:  h.epoch,
