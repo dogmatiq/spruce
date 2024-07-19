@@ -9,12 +9,12 @@ import (
 )
 
 type handler struct {
-	log          func(string) error
-	attrs        []slog.Attr
-	groups       []string
-	initialDepth int
-	threshold    slog.Level
-	writeTime    func(*strings.Builder, slog.Record)
+	log       func(string) error
+	attrs     []slog.Attr
+	groups    []string
+	depth     int
+	threshold slog.Level
+	writeTime func(*strings.Builder, slog.Record)
 }
 
 func (h *handler) Enabled(context.Context, slog.Level) bool {
@@ -76,7 +76,7 @@ func (h *handler) Handle(_ context.Context, rec slog.Record) error {
 
 	buf.WriteString(rec.Message)
 
-	writeAttrs(buf, h.initialDepth, attrs, true)
+	writeAttrs(buf, h.depth, attrs, true)
 
 	return h.log(buf.String())
 }
@@ -145,6 +145,8 @@ func (h *handler) WithAttrs(attrs []slog.Attr) slog.Handler {
 		log:       h.log,
 		attrs:     append(slices.Clone(h.attrs), attrs...),
 		groups:    h.groups,
+		depth:     h.depth,
+		threshold: h.threshold,
 		writeTime: h.writeTime,
 	}
 }
@@ -154,6 +156,8 @@ func (h *handler) WithGroup(name string) slog.Handler {
 		log:       h.log,
 		attrs:     h.attrs,
 		groups:    append(slices.Clone(h.groups), name),
+		depth:     h.depth,
+		threshold: h.threshold,
 		writeTime: h.writeTime,
 	}
 }

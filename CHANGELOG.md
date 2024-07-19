@@ -16,6 +16,11 @@ The format is based on [Keep a Changelog], and this project adheres to
 
 - Added `WithAbsoluteTimestamps()` and `WithRelativeTimestamps()` options.
 
+### Fixed
+
+- Fix loss of attribute indenting when using a grouped logger.
+- Fix reversion to relative timestamps when logging to an `io.Writer`.
+
 ### Changed
 
 - Indent the attributes when logging to an `io.Writer`.
