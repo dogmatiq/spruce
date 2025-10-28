@@ -10,7 +10,6 @@ import (
 
 	"github.com/dogmatiq/spruce"
 	. "github.com/dogmatiq/spruce"
-	"github.com/google/go-cmp/cmp"
 )
 
 func TestHandler_noAttributes(t *testing.T) {
@@ -75,6 +74,12 @@ func TestHandler_nestedAttributes(t *testing.T) {
 			"<group b>",
 			"<key-1>", "<value-1>",
 			"<key-2>", "<value-2>",
+			slog.Group(
+				"<group c>",
+				"<key-1>", "<value-1>",
+				"<key-2>", "<value-2>",
+				"<key-3>", "<value-3>",
+			),
 		),
 		slog.Group(
 			"<group a>",
@@ -85,7 +90,11 @@ func TestHandler_nestedAttributes(t *testing.T) {
 		`[INFO <timestamp>] <message>`,
 		`├─┬ <group b>`,
 		`│ ├── <key-1> ┈ <value-1>`,
-		`│ ╰── <key-2> ┈ <value-2>`,
+		`│ ├── <key-2> ┈ <value-2>`,
+		`│ ╰─┬ <group c>`,
+		`│   ├── <key-1> ┈ <value-1>`,
+		`│   ├── <key-2> ┈ <value-2>`,
+		`│   ╰── <key-3> ┈ <value-3>`,
 		`╰─┬ <group a>`,
 		`  ╰── <key-1> ┈ <value-1>`,
 	)
@@ -189,16 +198,16 @@ func (s *testingTStub) Log(args ...any) {
 
 func (s *testingTStub) Expect(lines ...string) {
 	timestamp := regexp.MustCompile(`\[([A-Z]+) [^\]\s]+`)
-
 	expect := strings.Join(lines, "\n")
-	for _, line := range s.actual {
-		line = timestamp.ReplaceAllString(line, "[$1 <timestamp>")
-		if line == expect {
+
+	for _, message := range s.actual {
+		message = timestamp.ReplaceAllString(message, "[$1 <timestamp>")
+		if expect == message {
 			return
 		}
 	}
 
-	if diff := cmp.Diff([]string{expect}, s.actual); diff != "" {
-		s.T.Errorf("unexpected logs (-want, +got): %s", diff)
-	}
+	s.T.Fail()
+	s.T.Log("--- EXPECTED ---")
+	s.T.Log(expect)
 }

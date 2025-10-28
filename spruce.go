@@ -72,19 +72,17 @@ func (h *handler) Handle(_ context.Context, rec slog.Record) error {
 	}
 
 	buf.WriteString("] ")
-
 	buf.WriteString(rec.Message)
 
-	writeAttrs(buf, 0, attrs, true)
+	writeAttrs(buf, nil, attrs)
 
 	return h.log(buf.String())
 }
 
 func writeAttrs(
 	buf *strings.Builder,
-	depth int,
+	parents []bool,
 	attrs []slog.Attr,
-	lastInParent bool,
 ) {
 	if len(attrs) == 0 {
 		return
@@ -92,25 +90,27 @@ func writeAttrs(
 
 	width := 0
 	for _, attr := range attrs {
-		if len(attr.Key) > width {
-			width = len(attr.Key)
+		if attr.Value.Kind() != slog.KindGroup {
+			if len(attr.Key) > width {
+				width = len(attr.Key)
+			}
 		}
 	}
 
 	for i, attr := range attrs {
-		last := i == len(attrs)-1
+		isLast := i == len(attrs)-1
 
 		buf.WriteByte('\n')
 
-		for i := 0; i < depth; i++ {
-			if lastInParent {
+		for _, parentIsLast := range parents {
+			if parentIsLast {
 				buf.WriteString("  ")
 			} else {
 				buf.WriteString("│ ")
 			}
 		}
 
-		if last {
+		if isLast {
 			buf.WriteString("╰─")
 		} else {
 			buf.WriteString("├─")
@@ -119,7 +119,11 @@ func writeAttrs(
 		if attr.Value.Kind() == slog.KindGroup {
 			buf.WriteString("┬ ")
 			buf.WriteString(attr.Key)
-			writeAttrs(buf, depth+1, attr.Value.Group(), last)
+			writeAttrs(
+				buf,
+				append(parents, isLast),
+				attr.Value.Group(),
+			)
 		} else {
 			buf.WriteString("─ ")
 			buf.WriteString(attr.Key)
