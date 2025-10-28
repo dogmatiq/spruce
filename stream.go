@@ -24,7 +24,6 @@ func NewStreamHandler(w io.Writer, options ...Option) slog.Handler {
 			}
 			return nil
 		},
-		depth: 1,
 	}
 
 	WithAbsoluteTimestamps()(h)
