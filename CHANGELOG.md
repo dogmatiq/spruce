@@ -20,6 +20,9 @@ The format is based on [Keep a Changelog], and this project adheres to
 
 - Fix loss of attribute indenting when using a grouped logger.
 - Fix reversion to relative timestamps when logging to an `io.Writer`.
+- Fix incorrect tree line rendering of groups nested within other groups.
+- Fix value alignment when groups and non-group attributes are rendered at the
+  same depth.
 
 ### Changed
 

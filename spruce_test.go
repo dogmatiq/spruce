@@ -33,6 +33,17 @@ func TestHandler_stringAttribute(t *testing.T) {
 	)
 }
 
+func TestHandler_emptyStringAttribute(t *testing.T) {
+	s := &testingTStub{T: t}
+	l := NewTestLogger(s)
+
+	l.Info("<message>", "<key>", "")
+	s.Expect(
+		`[INFO <timestamp>] <message>`,
+		`╰── <key> ┈ ""`,
+	)
+}
+
 func TestHandler_stringerAttribute(t *testing.T) {
 	s := &testingTStub{T: t}
 	l := NewTestLogger(s)

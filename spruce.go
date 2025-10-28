@@ -134,13 +134,21 @@ func writeAttrs(
 			buf.WriteString(" ")
 
 			v := attr.Value.String()
-			if strings.ContainsAny(v, " \t\n\r") {
+			if needsQuote(v) {
 				fmt.Fprintf(buf, "%q", v)
 			} else {
 				buf.WriteString(v)
 			}
 		}
 	}
+}
+
+func needsQuote(s string) bool {
+	if len(s) == 0 {
+		return true
+	}
+
+	return strings.ContainsAny(s, " \t\n\r")
 }
 
 func (h *handler) WithAttrs(attrs []slog.Attr) slog.Handler {
