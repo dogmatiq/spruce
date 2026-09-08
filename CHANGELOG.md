@@ -11,6 +11,13 @@ The format is based on [Keep a Changelog], and this project adheres to
 [semantic versioning]: https://semver.org/spec/v2.0.0.html
 [bc]: https://github.com/dogmatiq/.github/blob/main/VERSIONING.md#changelogs
 
+## [0.2.4] - 2026-09-09
+
+### Changed
+
+- Add empty line between log messages when logging to a stream to improve
+  readability.
+
 ## [0.2.3] - 2025-10-28
 
 ### Added
@@ -76,6 +83,7 @@ The format is based on [Keep a Changelog], and this project adheres to
 [0.2.1]: https://github.com/dogmatiq/spruce/releases/tag/v0.2.1
 [0.2.2]: https://github.com/dogmatiq/spruce/releases/tag/v0.2.2
 [0.2.3]: https://github.com/dogmatiq/spruce/releases/tag/v0.2.3
+[0.2.4]: https://github.com/dogmatiq/spruce/releases/tag/v0.2.4
 
 <!-- version template
 ## [0.0.1] - YYYY-MM-DD

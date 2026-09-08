@@ -5,7 +5,7 @@ import (
 	"log/slog"
 )
 
-var newLine = []byte{'\n'}
+var separator = []byte{'\n', '\n'}
 
 // NewStreamLogger returns a [slog.Logger] that writes to w.
 func NewStreamLogger(w io.Writer, options ...Option) *slog.Logger {
@@ -19,7 +19,7 @@ func NewStreamHandler(w io.Writer, options ...Option) slog.Handler {
 			if _, err := w.Write([]byte(s)); err != nil {
 				return err
 			}
-			if _, err := w.Write(newLine); err != nil {
+			if _, err := w.Write(separator); err != nil {
 				return err
 			}
 			return nil

@@ -14,7 +14,7 @@ func TestNewStreamLogger(t *testing.T) {
 	l.Info("<message>")
 
 	got := w.String()
-	want := "<message>\n"
+	want := "<message>\n\n"
 
 	if !strings.HasSuffix(got, want) {
 		t.Errorf("got %q, want suffix of %q", got, want)
